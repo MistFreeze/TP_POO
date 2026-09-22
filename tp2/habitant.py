@@ -66,6 +66,20 @@ class Habitant(object):
         else:
             raise ValueError("Les animaux doivent être un dictionnaire.")
 
+
+    @dispatch(object, str)
+    def set_info(habitant, nom):
+        """Surchage pour string"""
+        habitant.set_nom = nom
+
+    @dispatch(object, str, int)
+        def set_info(habitant, nom, age):
+        """ Surchage pour un string + int """
+        habitant.set_nom = nom
+        habitant.age = age
+        
+
+
 #Création d'un habitant
 h1  = Habitant("Aldric", 25, "Rue A", {"vaches":3})
 h1.age = 26
