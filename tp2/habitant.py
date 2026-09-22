@@ -2,9 +2,11 @@
 Création d'une classa Habitant et de 2 méthodes.
 
 """
+from multipledispatch import dispatch
+from abc import ABC
 
 
-class Habitant(object):
+class Habitant(ABC): #Habitant hérite d'ABC
     """
     Classe représentant un habitant.
     tous les attributs sont privés.
@@ -73,11 +75,55 @@ class Habitant(object):
         habitant.set_nom = nom
 
     @dispatch(object, str, int)
-        def set_info(habitant, nom, age):
+    def set_info(habitant, nom, age):
         """ Surchage pour un string + int """
         habitant.set_nom = nom
         habitant.age = age
         
+        @abstractmethod
+        #toute classe qui hérité de cnaar doit l'implémenter elle même sinon considéré comme abstraite
+        def calcul_nombre_annee_avant_retraite(self):
+            pass
+                    
+"""
+les méthodes/classe abstraite, sont utilisées pour ne pas être des classes principales, mais pour être utiliser. Elles servent de bases.
+
+"""
+
+
+class Adulte(Habitant): #Classe adulte hérite de la classe Habitant
+    def __init__(self, nom, age, adresse):
+        if age < 18 :
+            raise ValueError("Un adulte doit avoir 18 ou plus")
+        super().__init__(nom, age, adresse)
+
+    def calcul_nombre_annee_avant_retraite(self):
+        age_retraite = 62
+        if self.age >= age_retraite:
+            return "Déjà retraité"
+        else :
+            return age_retraite - self.age
+
+class Enfant(Habitant):
+    def __init__(self, nom, age, adresse):
+        if age >=18:
+            raise ValueError("un enfant à moins de 18ans")
+        super().__init__(nom, age, adresse)
+
+    def calcul_nombre_annee_avant_retraite(self):
+        return "Erreur : Un enfant ne peut pas calculer sa retraite"
+
+
+
+def __str__(self):
+    return f"{self.nom()}, {self.age()} ans, habite à {self.adresse()}"
+
+def affichage(h: Habitant): #dis que h est de type habitant
+    """Affichage d'un habitant"""
+    print(str(h))
+
+
+
 
 
 #Création d'un habitant
@@ -100,3 +146,28 @@ assert h1.compte_animaux("moutons") == 0
 h1.affichage_adresse() # affiche "Aldric habite a Rue A"
 
 
+# Adulte : leve une ValueError si age < 18
+# calcul_nombre_annee_avant_retraite() renvoie :
+# - "Deja a la retraite" si age >= 62
+# - 62 - age sinon
+# Enfant : leve une ValueError si age >= 18
+# calcul_nombre_annee_avant_retraite() renvoie toujours :
+# - "Erreur: un enfant ne peut pas calculer sa retraite"
+
+
+adulte = Adulte("Dupont", 35, "Rue A")
+enfant = Enfant("Martin", 12, "Rue B")
+
+assert isinstance(adulte, Habitant)
+assert adulte.calcul_nombre_annee_avant_retraite() == 27
+assert "enfant" in enfant.calcul_nombre_annee_avant_retraite()
+
+try:
+    Enfant("Oups", 25, "Rue C")
+    assert False, "une ValueError aurait dû être levée"
+except ValueError :
+    pass
+
+affichage(adulte)
+affichage(enfant)
+# Chaque habitant s’affiche correctement, quel que soit son type reel
